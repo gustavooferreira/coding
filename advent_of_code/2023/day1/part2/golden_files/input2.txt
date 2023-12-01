@@ -1,40 +1,4 @@
-package solutions_test
-
-type testCase struct {
-	name           string
-	text           string
-	expectedResult int
-}
-
-func getTestCases() []testCase {
-	return []testCase{
-		{
-			name:           "no input text",
-			text:           "",
-			expectedResult: 0,
-		},
-		{
-			name: "problem statement example",
-			text: `1abc2
-pqr3stu8vwx
-a1b2c3d4e5f
-treb7uchet`,
-			expectedResult: 142,
-		},
-		{
-			name: "example with empty lines",
-			text: `
-pqr3stu8vwx
-
-
-treb7uc0het
-
-`,
-			expectedResult: 108,
-		},
-		{
-			name: "problem statement challenge",
-			text: `nqninenmvnpsz874
+nqninenmvnpsz874
 8twofpmpxkvvdnpdnlpkhseven4ncgkb
 six8shdkdcdgseven8xczqrnnmthreecckfive
 qlcnz54dd75nine7jfnlfgz
@@ -1033,8 +997,4 @@ bdmdqptkjzn74
 lsmcmgtflzxmszdkjmdsklrgvtcdlpx4
 xsftnb6mvgqxv17four
 7gqqvzkvzbvxghxonekqvsteight
-nineninekfp49`,
-			expectedResult: 56397,
-		},
-	}
-}
+nineninekfp49

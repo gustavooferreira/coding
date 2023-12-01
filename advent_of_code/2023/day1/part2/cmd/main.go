@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"advent_of_code/2023/day1/part1/solutions"
+	"advent_of_code/2023/day1/part2/solutions"
 )
 
 // Run example:
