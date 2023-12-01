@@ -12,10 +12,12 @@ To run tests for a particular package do the following:
  go test -v [packages]
 ```
 
-For example, to test the very first Advent of Code exercise:
+For example, to test the code, put yourself inside the exercise folder and run:
 
 ```
- go test -v ./2023/1_1/solutions
+cd 2023/day1/part1
+
+ go test -v ./solutions
 ```
 
 As the golang documentation says (`go help packages`):
