@@ -35,6 +35,9 @@ Some or all types of parenthesis may show up in a string.
 > Output: true
 >
 > Stdout:
+>
 > () -> 2
+>
 > [] -> 3
+>
 > {} -> 3
