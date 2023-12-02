@@ -2,7 +2,7 @@
 
 Given a string (array of characters), return whether there are matching parenthesis in the string.
 
-The parenthesis in the string can be of all 3 types: (), [], {}.
+The parenthesis in the string can be of all 3 types: `()`, `[]`, `{}`.
 
 Some or all types of parenthesis may show up in a string.
 
@@ -20,7 +20,7 @@ Some or all types of parenthesis may show up in a string.
 >
 > Output: false
 
-** Example 3:**
+**Example 3:**
 
 > Input: str = "([{[]}])[]{{()}}"
 >
@@ -28,7 +28,7 @@ Some or all types of parenthesis may show up in a string.
 
 **Follow-up:** Keep track of how many matching brackets of each kind show up and print the result.
 
-** Example:**
+**Example:**
 
 > Input: str = "([{[]}])[]{{()}}"
 >
