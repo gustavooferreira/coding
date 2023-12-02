@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"advent_of_code/2023/day1/part2/solutions"
+	"github.com/gustavooferreira/coding/advent_of_code/2023/day1/part2/solutions"
 )
 
 func TestMyFunc(t *testing.T) {

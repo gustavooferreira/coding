@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"problem_solving/2_add_two_numbers/solutions"
+	"github.com/gustavooferreira/coding/leetcode/2/solutions"
 )
 
 func TestAddTwoNumbers_V1(t *testing.T) {

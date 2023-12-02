@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"problem_solving/gus_1_match_paras/solutions"
+	"github.com/gustavooferreira/coding/my_exercises/1/solutions"
 )
 
 func TestParenthesisMatch(t *testing.T) {

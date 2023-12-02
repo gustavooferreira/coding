@@ -24,6 +24,7 @@ func main() {
 
 }
 
+// when slice grows beyond its capacity, a new slice is allocated and we lose track of that pointer!
 func changeSlice(slice []int) {
 	slice = append(slice, 1)
 }

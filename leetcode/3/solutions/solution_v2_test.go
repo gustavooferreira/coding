@@ -5,10 +5,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"problem_solving/3_longest_substring_wo_rc/solutions"
+	"github.com/gustavooferreira/coding/leetcode/3/solutions"
 )
 
-func TestLengthOfLongestSubstrings_V1(t *testing.T) {
+func TestLengthOfLongestSubstrings_V2(t *testing.T) {
 	testCases := getTestCases()
 
 	for _, tc := range testCases {
@@ -17,9 +17,4 @@ func TestLengthOfLongestSubstrings_V1(t *testing.T) {
 			assert.Equal(t, tc.expectedResult, result)
 		})
 	}
-}
-
-func TestCountSequenceOfNonRepeatingCharacters(t *testing.T) {
-	result := solutions.CountSequenceOfNonRepeatingCharacters("abceaklui")
-	assert.Equal(t, 4, result)
 }

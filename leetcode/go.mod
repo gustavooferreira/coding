@@ -1,4 +1,4 @@
-module problem_solving
+module github.com/gustavooferreira/coding/leetcode
 
 go 1.21
 

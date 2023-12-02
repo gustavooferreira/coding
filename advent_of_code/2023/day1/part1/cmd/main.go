@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"advent_of_code/2023/day1/part1/solutions"
+	"github.com/gustavooferreira/coding/advent_of_code/2023/day1/part1/solutions"
 )
 
 // Run example:
-// > cat golden_files/input2.txt | go run cmd/main.go
+// > cat inputs/input2.txt | go run cmd/main.go
 func main() {
 	calibrator := solutions.NewCalibrator()
 

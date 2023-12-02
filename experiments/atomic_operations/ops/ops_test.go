@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"atomicops/ops"
+	"github.com/gustavooferreira/coding/atomicops/ops"
 )
 
 // TestIncrementOperation is only here so we can play with the -bench and -run flags for go test.

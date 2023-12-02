@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"problem_solving/1_two_sum/solutions"
+	"github.com/gustavooferreira/coding/leetcode/1/solutions"
 )
 
 func TestTwoSum_V2(t *testing.T) {

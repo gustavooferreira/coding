@@ -6,10 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"advent_of_code/2023/day1/part1/solutions"
+	"github.com/gustavooferreira/coding/advent_of_code/2023/day1/part1/solutions"
 )
 
-func TestMyFunc(t *testing.T) {
+func TestCalculateCalibrationArrayOfLines(t *testing.T) {
 	testCases := getTestCases()
 
 	for _, tc := range testCases {

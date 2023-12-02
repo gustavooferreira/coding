@@ -22,27 +22,25 @@ func (c *Calibrator) CalculateCalibrationArrayOfLines(lines []string) {
 // CalculateCalibrationForLine calculates the calibration for the line provided and returns the result.
 // It also adds the value to the accumulator of the calibrator.
 func (c *Calibrator) CalculateCalibrationForLine(line string) int {
-	var digits []int
+	firstDigit := true
+	leftDigit := 0
+	rightDigit := 0
 
 	for _, char := range line {
 		if unicode.IsDigit(char) {
 			d := int(char - '0')
-			digits = append(digits, d)
+			if firstDigit {
+				firstDigit = false
+				leftDigit = d
+				rightDigit = d
+			} else {
+				rightDigit = d
+			}
 		}
 	}
 
-	var result int
-
-	if len(digits) == 0 {
-		result = 0
-	} else if len(digits) == 1 {
-		result = digits[0]*10 + digits[0]
-	} else {
-		result = digits[0]*10 + digits[len(digits)-1]
-	}
-
+	result := leftDigit*10 + rightDigit
 	c.accumulator += result
-
 	return result
 }
 

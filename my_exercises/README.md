@@ -12,10 +12,10 @@ To run tests for a particular package do the following:
  go test -v [packages]
 ```
 
-For example, to test the very first Leet Code exercise:
+For example, to test my very first exercise:
 
 ```
- go test -v ./1_two_sum/solutions
+ go test -v ./1/solutions
 ```
 
 As the golang documentation says (`go help packages`):
