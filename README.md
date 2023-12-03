@@ -8,3 +8,5 @@ Folders:
 - `leetcode` - Leet Code problems and solutions.
 - `advent_of_code` - Advent of Code problems and solutions.
 - `my_exercises` - My own problems and solutions.
+
+Note: Each folder is a module!

@@ -18,21 +18,21 @@ The value we are passing to the argument `-run` necessary in order to avoid runn
 
 When running a benchmark in GoLand, these are the commands it ran:
 
-```
+```sh
 /opt/homebrew/opt/go/libexec/bin/go test -c -o /private/var/folders/x4/lp0kwd7s1p17vq7kc4vxgkrm0000gp/T/GoLand/___BenchmarkIncrement_in_atomicops_ops.test atomicops/ops #gosetup
 /private/var/folders/x4/lp0kwd7s1p17vq7kc4vxgkrm0000gp/T/GoLand/___BenchmarkIncrement_in_atomicops_ops.test -test.v -test.paniconexit0 -test.bench ^\QBenchmarkIncrement\E$ -test.run ^$
 ```
 
 Essentially, these were the commands ran:
 
-```
+```sh
 go test -c -o pkg.test atomicops/ops
 ./pkg.test -test.v -test.paniconexit0 -test.bench ^\QBenchmarkIncrement\E$ -test.run ^$
 ```
 
 Without the double step creating the test binary, we could mimic the above by doing:
 
-```
+```sh
 go test -v -bench "^\QBenchmarkIncrement\E$" -run "^$" atomicops/ops
 ```
 
@@ -45,21 +45,21 @@ regex engine to not interpret the text in-between those two "markers" as regexes
 
 When running a test in GoLand, these are the commands it ran:
 
-```
+```sh
 /opt/homebrew/opt/go/libexec/bin/go test -c -o /private/var/folders/x4/lp0kwd7s1p17vq7kc4vxgkrm0000gp/T/GoLand/___TestIncrementOperation_in_atomicops_ops.test atomicops/ops #gosetup
 /opt/homebrew/opt/go/libexec/bin/go tool test2json -t /private/var/folders/x4/lp0kwd7s1p17vq7kc4vxgkrm0000gp/T/GoLand/___TestIncrementOperation_in_atomicops_ops.test -test.v -test.paniconexit0 -test.run ^\QTestIncrementOperation\E$
 ```
 
 Essentially, these were the commands ran:
 
-```
+```sh
 go test -c -o pkg.test atomicops/ops
 go tool test2json -t pkg.test -test.v -test.paniconexit0 -test.run ^\QTestIncrementOperation\E$
 ```
 
 Without the double step creating the test binary, we could mimic the above by doing:
 
-```
+```sh
 go test -v -json -run "^\QTestIncrementOperation\E$" atomicops/ops
 ```
 
@@ -67,7 +67,7 @@ go test -v -json -run "^\QTestIncrementOperation\E$" atomicops/ops
 
 Run the following commands to get more information:
 
-```
+```sh
 go help test
 go help testflag
 go help packages
