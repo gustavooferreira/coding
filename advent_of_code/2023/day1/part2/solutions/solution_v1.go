@@ -60,5 +60,6 @@ func (c *Calibrator) CalculateCalibrationForLine(line string) int {
 
 // GetAccumulator returns the current result stored in the accumulator.
 func (c *Calibrator) GetAccumulator() int {
+	// Not exporting the variable makes sure the user only gets read-only access to the underlying field.
 	return c.accumulator
 }

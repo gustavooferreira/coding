@@ -15,9 +15,9 @@ func NewPowerCalculator() *PowerCalculator {
 }
 
 // ComputeMinimumGameSetArrayOfLines takes an array of lines and adds the cube set power to the accumulator.
-func (c *PowerCalculator) ComputeMinimumGameSetArrayOfLines(lines []string) error {
+func (pc *PowerCalculator) ComputeMinimumGameSetArrayOfLines(lines []string) error {
 	for i, line := range lines {
-		err := c.ComputeMinimumGameSetForLine(line)
+		err := pc.ComputeMinimumGameSetForLine(line)
 		if err != nil {
 			return fmt.Errorf("error on line %d: %w", i+1, err)
 		}
@@ -28,7 +28,7 @@ func (c *PowerCalculator) ComputeMinimumGameSetArrayOfLines(lines []string) erro
 
 // ComputeMinimumGameSetForLine finds the minimum set of cubes that must have been present in the bag for the given
 // game, and adds its power to the accumulator.
-func (c *PowerCalculator) ComputeMinimumGameSetForLine(line string) error {
+func (pc *PowerCalculator) ComputeMinimumGameSetForLine(line string) error {
 	line = strings.TrimSpace(line)
 
 	if len(line) == 0 {
@@ -78,11 +78,12 @@ func (c *PowerCalculator) ComputeMinimumGameSetForLine(line string) error {
 	// Calculate set of cubes power
 	setPower := maxCountCubes["red"] * maxCountCubes["green"] * maxCountCubes["blue"]
 
-	c.gameSetPowerAccumulator += setPower
+	pc.gameSetPowerAccumulator += setPower
 	return nil
 }
 
 // GetGameSetPowerAccumulator returns the current result stored in the game set power accumulator.
-func (c *PowerCalculator) GetGameSetPowerAccumulator() int {
-	return c.gameSetPowerAccumulator
+func (pc *PowerCalculator) GetGameSetPowerAccumulator() int {
+	// Not exporting the variable makes sure the user only gets read-only access to the underlying field.
+	return pc.gameSetPowerAccumulator
 }

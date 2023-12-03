@@ -24,9 +24,9 @@ func NewValidator() *Validator {
 
 // ValidateGameArrayOfLines takes an array of lines and adds their game ID number to the accumulator if the game is
 // valid.
-func (c *Validator) ValidateGameArrayOfLines(lines []string) error {
+func (v *Validator) ValidateGameArrayOfLines(lines []string) error {
 	for i, line := range lines {
-		err := c.ValidateGameForLine(line)
+		err := v.ValidateGameForLine(line)
 		if err != nil {
 			return fmt.Errorf("error on line %d: %w", i+1, err)
 		}
@@ -37,7 +37,7 @@ func (c *Validator) ValidateGameArrayOfLines(lines []string) error {
 
 // ValidateGameForLine validates whether the game represented by the line is valid and if so, add the game ID to the
 // accumulator.
-func (c *Validator) ValidateGameForLine(line string) error {
+func (v *Validator) ValidateGameForLine(line string) error {
 	line = strings.TrimSpace(line)
 
 	if len(line) == 0 {
@@ -84,12 +84,12 @@ func (c *Validator) ValidateGameForLine(line string) error {
 	}
 
 	// if we got here, game is valid
-	c.gameIDAccumulator += gameID
+	v.gameIDAccumulator += gameID
 	return nil
 }
 
 // GameIDAccumulator returns the current result stored in the Game ID accumulator.
-func (c *Validator) GameIDAccumulator() int {
+func (v *Validator) GameIDAccumulator() int {
 	// Not exporting the variable makes sure the user only gets read-only access to the underlying field.
-	return c.gameIDAccumulator
+	return v.gameIDAccumulator
 }
