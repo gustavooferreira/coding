@@ -20,7 +20,7 @@ func main() {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Printf("Error: error while scanning the file: %s", err)
+		fmt.Printf("Error: error while scanning the file: %s\n", err)
 		os.Exit(1)
 	}
 

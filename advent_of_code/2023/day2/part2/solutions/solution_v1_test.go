@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/gustavooferreira/coding/advent_of_code/2023/day2/part2/solutions"
 )
@@ -18,7 +19,8 @@ func TestComputeMinimumGameSetArrayOfLines(t *testing.T) {
 
 			powerCalculator := solutions.NewPowerCalculator()
 
-			powerCalculator.ComputeMinimumGameSetArrayOfLines(input)
+			err := powerCalculator.ComputeMinimumGameSetArrayOfLines(input)
+			require.NoError(t, err)
 			assert.Equal(t, tc.expectedResult, powerCalculator.GetGameSetPowerAccumulator())
 		})
 	}

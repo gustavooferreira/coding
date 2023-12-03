@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/gustavooferreira/coding/advent_of_code/2023/day2/part1/solutions"
 )
@@ -18,8 +19,9 @@ func TestValidateGameArrayOfLines(t *testing.T) {
 
 			validator := solutions.NewValidator()
 
-			validator.ValidateGameArrayOfLines(input)
-			assert.Equal(t, tc.expectedResult, validator.GetGameIDAccumulator())
+			err := validator.ValidateGameArrayOfLines(input)
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedResult, validator.GameIDAccumulator())
 		})
 	}
 }
