@@ -1,7 +1,6 @@
 package solutions_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,13 +14,13 @@ func TestComputeMinimumGameSetArrayOfLines(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			input := strings.Split(tc.text, "\n")
+			input := tc.textInfo.GetTextContent(t)
 
 			powerCalculator := solutions.NewPowerCalculator()
 
 			err := powerCalculator.ComputeMinimumGameSetArrayOfLines(input)
 			require.NoError(t, err)
-			assert.Equal(t, tc.expectedResult, powerCalculator.GetGameSetPowerAccumulator())
+			assert.Equal(t, tc.expectedResult, powerCalculator.GameSetPowerAccumulator())
 		})
 	}
 }

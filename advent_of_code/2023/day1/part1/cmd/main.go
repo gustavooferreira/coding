@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 
@@ -9,14 +10,22 @@ import (
 )
 
 // Run example:
-// > cat inputs/input2.txt | go run cmd/main.go
+// > cat solutions/testdata/input2.txt | go run cmd/main.go
 func main() {
+	debugFlag := flag.Bool("debug", false, "print debug messages")
+	flag.Parse()
+
 	calibrator := solutions.NewCalibrator()
+	calibrator.SetDebug(*debugFlag)
+
+	lineNumber := 1
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
-		calibrator.CalculateCalibrationForLine(line)
+		calibrator.CalculateCalibrationForLine(lineNumber, line)
+
+		lineNumber++
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -24,5 +33,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("Result: %d\n", calibrator.GetAccumulator())
+	if *debugFlag {
+		fmt.Println("--------------------")
+	}
+
+	fmt.Printf("Result: %d\n", calibrator.Accumulator())
 }

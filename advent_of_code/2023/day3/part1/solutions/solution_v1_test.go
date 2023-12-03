@@ -1,7 +1,6 @@
 package solutions_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,14 +14,14 @@ func TestComputePartNumber(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			input := strings.Split(tc.text, "\n")
+			input := tc.textInfo.GetTextContent(t)
 
 			partNumberFinder := solutions.NewPartNumberFinder()
 			partNumberFinder.LoadArrayOfLines(input)
 
 			err := partNumberFinder.ComputePartNumber()
 			require.NoError(t, err)
-			assert.Equal(t, tc.expectedResult, partNumberFinder.GetPartNumber())
+			assert.Equal(t, tc.expectedResult, partNumberFinder.PartNumber())
 		})
 	}
 }

@@ -8,6 +8,8 @@ import (
 )
 
 type PartNumberFinder struct {
+	debug bool
+
 	// internal representation of the schematic
 	schematic  []string
 	partNumber int
@@ -15,6 +17,10 @@ type PartNumberFinder struct {
 
 func NewPartNumberFinder() *PartNumberFinder {
 	return &PartNumberFinder{}
+}
+
+func (pnf *PartNumberFinder) SetDebug(enable bool) {
+	pnf.debug = enable
 }
 
 // LoadArrayOfLines loads the array of lines into the internal state.
@@ -64,7 +70,22 @@ func (pnf *PartNumberFinder) ComputePartNumber() error {
 		}
 	}
 
-	validNumbers := pnf.GetValidNumbers(numbers)
+	if pnf.debug {
+		fmt.Println("All numbers found:")
+		for _, number := range numbers {
+			fmt.Printf("%+v\n", number)
+		}
+		fmt.Println("-----")
+	}
+
+	validNumbers := pnf.getValidNumbers(numbers)
+
+	if pnf.debug {
+		fmt.Println("All valid numbers:")
+		for _, validNumber := range validNumbers {
+			fmt.Printf("%+v\n", validNumber)
+		}
+	}
 
 	for _, validNumber := range validNumbers {
 		pnf.partNumber += validNumber
@@ -73,8 +94,8 @@ func (pnf *PartNumberFinder) ComputePartNumber() error {
 	return nil
 }
 
-// GetValidNumbers returns the numbers that belong to the part number.
-func (pnf *PartNumberFinder) GetValidNumbers(numbers []number) []int {
+// getValidNumbers returns the numbers that belong to the part number.
+func (pnf *PartNumberFinder) getValidNumbers(numbers []number) []int {
 	var validNumbers []int
 
 	// Compute limits
@@ -110,9 +131,9 @@ func (pnf *PartNumberFinder) GetValidNumbers(numbers []number) []int {
 	return validNumbers
 }
 
-// GetPartNumber return the part number.
+// PartNumber return the part number.
 // Use this method after calling ComputePartNumber method.
-func (pnf *PartNumberFinder) GetPartNumber() int {
+func (pnf *PartNumberFinder) PartNumber() int {
 	// Not exporting the variable makes sure the user only gets read-only access to the underlying field.
 	return pnf.partNumber
 }

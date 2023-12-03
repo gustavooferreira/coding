@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 
@@ -9,16 +10,20 @@ import (
 )
 
 // Run example:
-// > cat inputs/input2.txt | go run cmd/main.go
+// > cat solutions/testdata/input2.txt | go run cmd/main.go
 func main() {
+	debugFlag := flag.Bool("debug", false, "print debug messages")
+	flag.Parse()
+
 	powerCalculator := solutions.NewPowerCalculator()
+	powerCalculator.SetDebug(*debugFlag)
 
 	lineNumber := 1
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
-		err := powerCalculator.ComputeMinimumGameSetForLine(line)
+		err := powerCalculator.ComputeMinimumGameSetForLine(lineNumber, line)
 		if err != nil {
 			fmt.Printf("Error: error while checking game line number %d: %s\n", lineNumber, err)
 			os.Exit(1)
@@ -32,5 +37,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("Result: %d\n", powerCalculator.GetGameSetPowerAccumulator())
+	if *debugFlag {
+		fmt.Println("--------------------")
+	}
+
+	fmt.Printf("Result: %d\n", powerCalculator.GameSetPowerAccumulator())
 }

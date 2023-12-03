@@ -8,6 +8,8 @@ import (
 )
 
 type GearRatioFinder struct {
+	debug bool
+
 	// internal representation of the schematic
 	schematic    []string
 	gearRatioSum int
@@ -15,6 +17,10 @@ type GearRatioFinder struct {
 
 func NewGearRatioFinder() *GearRatioFinder {
 	return &GearRatioFinder{}
+}
+
+func (grf *GearRatioFinder) SetDebug(enable bool) {
+	grf.debug = enable
 }
 
 // LoadArrayOfLines loads the array of lines into the internal state.
@@ -64,7 +70,23 @@ func (grf *GearRatioFinder) ComputeGearRatioSum() error {
 		}
 	}
 
+	if grf.debug {
+		fmt.Println("All numbers found:")
+		for _, number := range numbers {
+			fmt.Printf("%+v\n", number)
+		}
+		fmt.Println("-----")
+	}
+
 	validNumbers := grf.getValidNumbers(numbers)
+
+	if grf.debug {
+		fmt.Println("All valid numbers:")
+		for _, validNumber := range validNumbers {
+			fmt.Printf("%+v\n", validNumber)
+		}
+		fmt.Println("-----")
+	}
 
 	validNumbersHash := make(map[string][]number)
 	for _, validNumber := range validNumbers {
@@ -74,6 +96,13 @@ func (grf *GearRatioFinder) ComputeGearRatioSum() error {
 			gearKey := fmt.Sprintf("%d,%d", gearCoordinate.y, gearCoordinate.x)
 
 			validNumbersHash[gearKey] = append(validNumbersHash[gearKey], validNumber)
+		}
+	}
+
+	if grf.debug {
+		fmt.Println("All valid numbers in a hash:")
+		for _, nrs := range validNumbersHash {
+			fmt.Printf("%+v\n", nrs)
 		}
 	}
 
@@ -157,9 +186,9 @@ func (grf *GearRatioFinder) getValidNumbers(numbers []number) []number {
 	return validNumbers
 }
 
-// GetGearRatioSum return the gear ratio sum.
-// Use this method after calling GetGearRatioSum method.
-func (grf *GearRatioFinder) GetGearRatioSum() int {
+// GearRatioSum return the gear ratio sum.
+// Use this method after calling GearRatioSum method.
+func (grf *GearRatioFinder) GearRatioSum() int {
 	// Not exporting the variable makes sure the user only gets read-only access to the underlying field.
 	return grf.gearRatioSum
 }

@@ -1,7 +1,6 @@
 package solutions_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,14 +14,14 @@ func TestComputeGearRatioSum(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			input := strings.Split(tc.text, "\n")
+			input := tc.textInfo.GetTextContent(t)
 
 			gearRatioFinder := solutions.NewGearRatioFinder()
 			gearRatioFinder.LoadArrayOfLines(input)
 
 			err := gearRatioFinder.ComputeGearRatioSum()
 			require.NoError(t, err)
-			assert.Equal(t, tc.expectedResult, gearRatioFinder.GetGearRatioSum())
+			assert.Equal(t, tc.expectedResult, gearRatioFinder.GearRatioSum())
 		})
 	}
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 
@@ -9,16 +10,20 @@ import (
 )
 
 // Run example:
-// > cat inputs/input2.txt | go run cmd/main.go
+// > cat solutions/testdata/input2.txt | go run cmd/main.go
 func main() {
+	debugFlag := flag.Bool("debug", false, "print debug messages")
+	flag.Parse()
+
 	validator := solutions.NewValidator()
+	validator.SetDebug(*debugFlag)
 
 	lineNumber := 1
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
-		err := validator.ValidateGameForLine(line)
+		err := validator.ValidateGameForLine(lineNumber, line)
 		if err != nil {
 			fmt.Printf("Error: error while checking game line number %d: %s\n", lineNumber, err)
 			os.Exit(1)
@@ -30,6 +35,10 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("Error: error while scanning the file: %s\n", err)
 		os.Exit(1)
+	}
+
+	if *debugFlag {
+		fmt.Println("--------------------")
 	}
 
 	fmt.Printf("Result: %d\n", validator.GameIDAccumulator())

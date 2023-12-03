@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 
@@ -9,9 +10,13 @@ import (
 )
 
 // Run example:
-// > cat inputs/input2.txt | go run cmd/main.go
+// > cat solutions/testdata/input2.txt | go run cmd/main.go
 func main() {
+	debugFlag := flag.Bool("debug", false, "print debug messages")
+	flag.Parse()
+
 	partNumberFinder := solutions.NewPartNumberFinder()
+	partNumberFinder.SetDebug(*debugFlag)
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
@@ -29,5 +34,9 @@ func main() {
 		fmt.Printf("Error: error while computing part number: %s\n", err)
 	}
 
-	fmt.Printf("Result: %d\n", partNumberFinder.GetPartNumber())
+	if *debugFlag {
+		fmt.Println("--------------------")
+	}
+
+	fmt.Printf("Result: %d\n", partNumberFinder.PartNumber())
 }

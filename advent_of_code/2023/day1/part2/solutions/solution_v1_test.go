@@ -1,7 +1,6 @@
 package solutions_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,12 +13,12 @@ func TestMyFunc(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			input := strings.Split(tc.text, "\n")
+			input := tc.textInfo.GetTextContent(t)
 
 			calibrator := solutions.NewCalibrator()
 
 			calibrator.CalculateCalibrationArrayOfLines(input)
-			assert.Equal(t, tc.expectedResult, calibrator.GetAccumulator())
+			assert.Equal(t, tc.expectedResult, calibrator.Accumulator())
 		})
 	}
 }
