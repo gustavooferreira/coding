@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gustavooferreira/coding/advent_of_code/2023/day1/part1/solutions"
+	"github.com/gustavooferreira/coding/advent_of_code/template_dayX_partY/solutions"
 )
 
 // Run example:
@@ -15,7 +15,7 @@ func main() {
 	debugFlag := flag.Bool("debug", false, "print debug messages")
 	flag.Parse()
 
-	calibrator := solutions.NewCalibrator()
+	calibrator := solutions.NewSolver()
 	calibrator.SetDebug(*debugFlag)
 
 	lineNumber := 1
@@ -23,7 +23,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
-		calibrator.CalculateCalibrationForLine(lineNumber, line)
+		calibrator.ComputeForLine(lineNumber, line)
 
 		lineNumber++
 	}

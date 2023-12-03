@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/gustavooferreira/coding/advent_of_code/2023/day1/part1/solutions"
+	"github.com/gustavooferreira/coding/advent_of_code/template_dayX_partY/solutions"
 )
 
 func TestCalculateCalibrationArrayOfLines(t *testing.T) {
@@ -15,9 +15,9 @@ func TestCalculateCalibrationArrayOfLines(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			input := tc.textInfo.GetTextContent(t)
 
-			calibrator := solutions.NewCalibrator()
+			calibrator := solutions.NewSolver()
 
-			calibrator.CalculateCalibrationArrayOfLines(input)
+			calibrator.LoadArrayOfLines(input)
 			assert.Equal(t, tc.expectedResult, calibrator.Accumulator())
 		})
 	}
