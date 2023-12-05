@@ -5,40 +5,53 @@ import (
 )
 
 type Solver struct {
-	debug       bool
-	accumulator int
+	debug        bool
+	inputContent []string
+	result       int
 }
 
 func NewSolver() *Solver {
 	return &Solver{}
 }
 
-func (c *Solver) SetDebug(enable bool) {
-	c.debug = enable
+func (s *Solver) SetDebug(enable bool) {
+	s.debug = enable
 }
 
-// LoadArrayOfLines takes an array of lines and adds their value number to the accumulator.
-func (c *Solver) LoadArrayOfLines(lines []string) {
-	for i, line := range lines {
-		c.ComputeForLine(i+1, line)
+// LoadArrayOfLines loads the array in the internal representation of the input content.
+func (s *Solver) LoadArrayOfLines(lines []string) {
+	for _, line := range lines {
+		s.LoadLine(line)
 	}
 }
 
-// ComputeForLine calculates the value for the line provided and returns the result.
-// It also adds the value to the accumulator of the Solver.
-func (c *Solver) ComputeForLine(lineNumber int, line string) int {
+// LoadLine loads the input line into the internal representation of the input content.
+func (s *Solver) LoadLine(line string) {
+	s.inputContent = append(s.inputContent, line)
+}
+
+// ComputeResult computes the result and stores it in the result field.
+func (s *Solver) ComputeResult() {
+	for i, line := range s.inputContent {
+		s.ComputeLine(i+1, line)
+	}
+}
+
+// ComputeLine computes the result for line.
+// This method may not be used at times.
+func (s *Solver) ComputeLine(lineNumber int, line string) int {
 	result := 0
 
-	if c.debug {
+	if s.debug {
 		fmt.Printf("Line: %3d -- Number: %d\n", lineNumber, result)
 	}
 
-	c.accumulator += result
+	s.result += result
 	return result
 }
 
-// Accumulator returns the current result stored in the accumulator.
-func (c *Solver) Accumulator() int {
+// Result returns the current result stored in the Solver.
+func (s *Solver) Result() int {
 	// Not exporting the variable makes sure the user only gets read-only access to the underlying field.
-	return c.accumulator
+	return s.result
 }

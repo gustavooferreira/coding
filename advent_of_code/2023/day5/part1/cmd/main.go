@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gustavooferreira/coding/advent_of_code/template_dayX_partY/solutions"
+	"github.com/gustavooferreira/coding/advent_of_code/2023/day5/part1/solutions"
 )
 
 // Run example:

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/gustavooferreira/coding/advent_of_code/template_dayX_partY/solutions"
+	"github.com/gustavooferreira/coding/advent_of_code/2023/day5/part1/solutions"
 )
 
 func TestSolver(t *testing.T) {
