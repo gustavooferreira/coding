@@ -11,13 +11,6 @@ type testCase struct {
 func getTestCases() []testCase {
 	return []testCase{
 		{
-			name: "no input text",
-			textInfo: testutils.TextInfo{
-				Content: "",
-			},
-			expectedResult: 0,
-		},
-		{
 			name: "problem statement example",
 			textInfo: testutils.TextInfo{
 				FilePath: "testdata/input1.txt",

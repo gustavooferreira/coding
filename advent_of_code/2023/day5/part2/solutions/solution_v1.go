@@ -115,41 +115,54 @@ func (s *Solver) computeMappings() {
 func (s *Solver) ComputeResult() {
 	s.computeMappings()
 
-	// // compute the "linked list result" and store the seed number and the location together.
-	// var seedsLocationPair []SeedLocation
-	//
-	// for _, seedNumber := range seedsNumbers {
-	// 	// walk through the mappings and get the location
-	// 	source := "seed"
-	// 	number := seedNumber
-	//
-	// 	for {
-	// 		mapper := s.mappings[source]
-	// 		number = mapper.Lookup(number)
-	// 		source = mapper.Destination
-	//
-	// 		if mapper.Destination == "location" {
-	// 			// store result
-	// 			seedsLocationPair = append(seedsLocationPair, SeedLocation{
-	// 				Seed:     seedNumber,
-	// 				Location: number,
-	// 			})
-	//
-	// 			break
-	// 		}
-	// 	}
-	// }
-	//
-	// // find the minimum location and return the seed number
-	// minLocation := -1
-	//
-	// for _, seedsLocationPair := range seedsLocationPair {
-	// 	if minLocation == -1 || seedsLocationPair.Location < minLocation {
-	// 		minLocation = seedsLocationPair.Location
-	// 	}
-	// }
-	//
-	// s.result = minLocation
+	// end up with a bunch of locations
+	var locations []ItemRange
+
+	source := "seed"
+	items := s.seeds
+
+	// go over the "linked list"
+	for {
+		mapper := s.mappings[source]
+
+		var outputItems []ItemRange
+		for _, itemRange := range items {
+			subOutputItems := mapper.Lookup(itemRange)
+			outputItems = append(outputItems, subOutputItems...)
+		}
+
+		source = mapper.Destination
+		items = outputItems
+
+		if mapper.Destination == "location" {
+			// store result
+			locations = append(locations, items...)
+			break
+		}
+	}
+
+	// don't need this but it's nice for the output
+	sort.Slice(locations, func(i int, j int) bool {
+		return locations[i].Start < locations[j].Start
+	})
+
+	if s.debug {
+		fmt.Println("Locations:")
+		for _, location := range locations {
+			fmt.Printf("%+v\n", location)
+		}
+	}
+
+	// find the minimum location and return the seed number
+	minLocation := -1
+
+	for _, location := range locations {
+		if minLocation == -1 || location.Start < minLocation {
+			minLocation = location.Start
+		}
+	}
+
+	s.result = minLocation
 }
 
 // Result returns the current result stored in the Solver.
@@ -168,9 +181,9 @@ func (sr *ItemRange) GetRange() (start int, end int) {
 	return sr.Start, sr.Start + sr.Length - 1
 }
 
-type SeedLocation struct {
-	Seed     int
-	Location int
+type SeedsRangeLocation struct {
+	Seed      ItemRange
+	Locations []ItemRange
 }
 
 // RangeMapperInfo represents a range and the corresponding mapped numbers.
@@ -207,22 +220,86 @@ func (gm *GenericMapper) AddRangeMapping(dstStart int, srcStart int, length int)
 // Lookup performs a mapping lookup.
 // Returns ranges of output.
 func (gm *GenericMapper) Lookup(input ItemRange) (output []ItemRange) {
+	rangeStart := input.Start
+	rangeEnd := input.Start + input.Length - 1
 
-	// start with the first element and go over the various ranges
+	// edge case (starting at zero)
+	if rangeStart < gm.ranges[0].SourceStart {
+		output = append(output, ItemRange{
+			Start:  rangeStart,
+			Length: gm.ranges[0].SourceStart - rangeStart,
+		})
+	}
 
-	// return the various ranges for different mappings
+	// edge case (towards infinity)
+	lastEdge := gm.ranges[len(gm.ranges)-1].SourceStart + gm.ranges[len(gm.ranges)-1].Length // pointer to first number
+	if rangeEnd >= lastEdge {
+		output = append(output, ItemRange{
+			Start:  lastEdge,
+			Length: rangeEnd - lastEdge + 1,
+		})
+	}
 
-	// // look up based on ranges
-	// for _, rng := range gm.ranges {
-	// 	if input >= rng.SourceStart && input <= rng.SourceStart+rng.Length-1 {
-	// 		return rng.DestinationStart + input - rng.SourceStart
-	// 	}
-	// }
-	//
-	// // if we couldn't find it then return the same input number
-	// return []ItemRange{{
-	// 	Start:  0,
-	// 	Length: 0,
-	// }}
-	return nil
+	// compute overlap inside boxes
+	for _, rng := range gm.ranges {
+		boxStart := rng.SourceStart
+		boxEnd := rng.SourceStart + rng.Length - 1
+
+		item, valid := computeOverlap(rangeStart, rangeEnd, boxStart, boxEnd)
+		if !valid { // range falls outside the box
+			continue
+		}
+
+		// shift start index
+		item.Start = item.Start + (rng.DestinationStart - rng.SourceStart)
+
+		output = append(output, item)
+	}
+
+	// compute space between boxes
+	for i, rng := range gm.ranges {
+		// skip computing last segment in-between boxes (we took care of that above in the edge case)
+		if i >= len(gm.ranges)-1 {
+			continue
+		}
+
+		boxStart := rng.SourceStart + rng.Length
+		boxEnd := gm.ranges[i+1].SourceStart - 1
+
+		item, valid := computeOverlap(rangeStart, rangeEnd, boxStart, boxEnd)
+		if !valid { // range falls outside the box
+			continue
+		}
+
+		output = append(output, item)
+	}
+
+	return output
+}
+
+func computeOverlap(rangeStart int, rangeEnd int, boxStart int, boxEnd int) (itemRange ItemRange, valid bool) {
+	// range falls outside the box
+	if rangeEnd < boxStart || rangeStart > boxEnd {
+		return ItemRange{}, false
+	}
+
+	start := 0
+	end := 0
+
+	if rangeStart < boxStart {
+		start = boxStart
+	} else {
+		start = rangeStart
+	}
+
+	if rangeEnd > boxEnd {
+		end = boxEnd
+	} else {
+		end = rangeEnd
+	}
+
+	return ItemRange{
+		Start:  start,
+		Length: end - start + 1,
+	}, true
 }

@@ -15,14 +15,14 @@ func getTestCases() []testCase {
 			textInfo: testutils.TextInfo{
 				FilePath: "testdata/input1.txt",
 			},
-			expectedResult: 46,
+			expectedResult: 71503,
 		},
 		{
 			name: "problem statement challenge",
 			textInfo: testutils.TextInfo{
 				FilePath: "testdata/input2.txt",
 			},
-			expectedResult: 0,
+			expectedResult: 34278221,
 		},
 	}
 }
