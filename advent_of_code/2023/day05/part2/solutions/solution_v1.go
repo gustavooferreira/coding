@@ -2,6 +2,7 @@ package solutions
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -225,18 +226,25 @@ func (gm *GenericMapper) Lookup(input ItemRange) (output []ItemRange) {
 
 	// edge case (starting at zero)
 	if rangeStart < gm.ranges[0].SourceStart {
+		// work out minimum length
+		length1 := gm.ranges[0].SourceStart - rangeStart
+		length2 := input.Length
+		length := int(math.Min(float64(length1), float64(length2)))
+
 		output = append(output, ItemRange{
 			Start:  rangeStart,
-			Length: gm.ranges[0].SourceStart - rangeStart,
+			Length: length,
 		})
 	}
 
 	// edge case (towards infinity)
-	lastEdge := gm.ranges[len(gm.ranges)-1].SourceStart + gm.ranges[len(gm.ranges)-1].Length // pointer to first number
-	if rangeEnd >= lastEdge {
+	lastRange := gm.ranges[len(gm.ranges)-1]
+	lastEdge := lastRange.SourceStart + lastRange.Length - 1 // last valid point in the range
+	if rangeEnd > lastEdge {
+		startPoint := int(math.Max(float64(lastEdge+1), float64(rangeStart)))
 		output = append(output, ItemRange{
-			Start:  lastEdge,
-			Length: rangeEnd - lastEdge + 1,
+			Start:  startPoint,
+			Length: rangeEnd - startPoint,
 		})
 	}
 
@@ -265,6 +273,11 @@ func (gm *GenericMapper) Lookup(input ItemRange) (output []ItemRange) {
 
 		boxStart := rng.SourceStart + rng.Length
 		boxEnd := gm.ranges[i+1].SourceStart - 1
+
+		// when boxEnd is less than boxStart, it means we don't have any gaps between ranges
+		if boxEnd < boxStart {
+			continue
+		}
 
 		item, valid := computeOverlap(rangeStart, rangeEnd, boxStart, boxEnd)
 		if !valid { // range falls outside the box

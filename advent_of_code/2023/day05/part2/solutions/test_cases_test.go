@@ -22,7 +22,7 @@ func getTestCases() []testCase {
 			textInfo: testutils.TextInfo{
 				FilePath: "testdata/input2.txt",
 			},
-			expectedResult: 0,
+			expectedResult: 47909639,
 		},
 	}
 }

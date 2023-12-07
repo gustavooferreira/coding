@@ -106,7 +106,7 @@ func TestGenericMapperLookup(t *testing.T) {
 			},
 			{
 				Start:  90,
-				Length: 20,
+				Length: 19,
 			},
 		}
 
