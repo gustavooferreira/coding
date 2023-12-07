@@ -22,7 +22,7 @@ go test -v [packages]
 For example, to test the code, put yourself inside the exercise folder and run:
 
 ```sh
-cd 2023/day1/part1
+cd 2023/day01/part1
 go test -v ./solutions
 ```
 
