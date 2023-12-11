@@ -33,21 +33,12 @@ func (s *Solver) LoadLine(line string) {
 // ComputeResult computes the result and stores it in the result field.
 func (s *Solver) ComputeResult() {
 	for i, line := range s.inputContent {
-		s.ComputeLine(i+1, line)
-	}
-}
-
-// ComputeLine computes the result for line.
-// This method may not be used at times.
-func (s *Solver) ComputeLine(lineNumber int, line string) int {
-	result := 0
-
-	if s.debug {
-		fmt.Printf("Line: %3d -- Number: %d\n", lineNumber, result)
+		if s.debug {
+			fmt.Printf("Line: %3d -- Line: %s\n", i+1, line)
+		}
 	}
 
-	s.result += result
-	return result
+	s.result = 0
 }
 
 // Result returns the current result stored in the Solver.
