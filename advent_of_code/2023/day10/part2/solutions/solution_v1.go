@@ -70,30 +70,8 @@ func (s *Solver) ComputeResult() {
 		fmt.Printf("Candidates: %+v\n", tileCandidates)
 	}
 
-	// setup map with the walls part of the path only
-
-	currentPosition := tileCandidates[0].Position
-	nextDirection := tileCandidates[0].Out
-	for {
-		currentTileType := TileType(s.puzzle[currentPosition.y][currentPosition.x])
-
-		tile := s.tiles[currentPosition.y][currentPosition.x]
-		tile.TileContainerType = TileContainerType_Wall
-		tile.WallType = currentTileType
-		s.tiles[currentPosition.y][currentPosition.x] = tile
-
-		if currentTileType == TileTypeStart {
-			break
-		}
-
-		currentPosition = GetNextPosition(currentPosition, nextDirection)
-
-		newTile := TileType(s.puzzle[currentPosition.y][currentPosition.x])
-		nextDirection = FindNextDirection(TileType(newTile), nextDirection)
-	}
-
-	// Replace S with correct pipe type
-	s.tiles[s.startPosition.y][s.startPosition.x].WallType = startTileType
+	// setup map with the walls part of the path only (and substitute start with correct pipe)
+	s.SetTilesForWallsOnly(tileCandidates[0], startTileType)
 
 	if s.debug {
 		fmt.Println("Walls:")
@@ -110,35 +88,19 @@ func (s *Solver) ComputeResult() {
 		fmt.Println()
 	}
 
-	// Start with initial state of all cells marked as being inside
-	for _, line := range s.tiles {
-		for _, tile := range line {
+	// Mark all cells as being inside
+	for i, tilesLine := range s.tiles {
+		for j, tile := range tilesLine {
 			if tile.TileContainerType == TileContainerType_Cell {
-				tile.TileContainerLocation = TileContainerLocation_Inside
+				s.tiles[i][j].TileContainerLocation = TileContainerLocation_Inside
 			}
 		}
 	}
 
-	// do stuff here
+	// expand puzzle, rows, columns and borders
+	s.ExpandPuzzle()
 
-	if s.debug {
-		fmt.Println("Tiles State:")
-		for _, line := range s.tiles {
-			for _, tile := range line {
-				if tile.TileContainerType == TileContainerType_Wall {
-					fmt.Printf("%s", string(tile.WallType))
-				} else {
-					if tile.TileContainerLocation == TileContainerLocation_Inside {
-						fmt.Printf("I")
-					} else if tile.TileContainerLocation == TileContainerLocation_Outside {
-						fmt.Printf("O")
-					}
-				}
-			}
-			fmt.Println()
-		}
-		fmt.Println()
-	}
+	// Run Flood fill algo and mark cells we find as being outside.
 
 	// Count how many tiles are of type cell and are inside the loop
 	result := 0
@@ -149,6 +111,25 @@ func (s *Solver) ComputeResult() {
 			}
 		}
 	}
+
+	// if s.debug {
+	// 	fmt.Println("Tiles State:")
+	// 	for _, line := range s.tiles {
+	// 		for _, tile := range line {
+	// 			if tile.TileContainerType == TileContainerType_Wall {
+	// 				fmt.Printf("%s", string(tile.WallType))
+	// 			} else {
+	// 				if tile.TileContainerLocation == TileContainerLocation_Inside {
+	// 					fmt.Printf("I")
+	// 				} else if tile.TileContainerLocation == TileContainerLocation_Outside {
+	// 					fmt.Printf("O")
+	// 				}
+	// 			}
+	// 		}
+	// 		fmt.Println()
+	// 	}
+	// 	fmt.Println()
+	// }
 
 	s.result = result
 }
@@ -175,72 +156,83 @@ func (s *Solver) FindStartingPosition() Position {
 	return Position{}
 }
 
+func (s *Solver) ExpandPuzzle() {
+	var tiles [][]TileState
+
+	// TODO: remove this
+	tiles = s.tiles
+
+	// Expand the puzzle to include one extra column per column
+	// Expand the puzzle to include one extra row per row
+	// Make sure we have a border all around so the next algo can fill around
+
+	s.tiles = tiles
+}
+
+// FloodFill flood fills the puzzle marking all cells it can find as being outside.
+func (s *Solver) FloodFill() {
+
+}
+
+// setup map with the walls part of the path only (and substitute start position with correct pipe)
+func (s *Solver) SetTilesForWallsOnly(initialTile PositionDirection, startTileType TileType) {
+	currentPosition := initialTile.Position
+	nextDirection := initialTile.Out
+	for {
+		currentTileType := TileType(s.puzzle[currentPosition.y][currentPosition.x])
+
+		tile := s.tiles[currentPosition.y][currentPosition.x]
+		tile.TileContainerType = TileContainerType_Wall
+		tile.WallType = currentTileType
+		s.tiles[currentPosition.y][currentPosition.x] = tile
+
+		if currentTileType == TileTypeStart {
+			break
+		}
+
+		currentPosition = GetNextPosition(currentPosition, nextDirection)
+
+		newTile := TileType(s.puzzle[currentPosition.y][currentPosition.x])
+		nextDirection = FindNextDirection(TileType(newTile), nextDirection)
+	}
+
+	// Replace S with correct pipe type
+	s.tiles[s.startPosition.y][s.startPosition.x].WallType = startTileType
+}
+
+// FindTileCandidates finds possible tile candidates.
+// This function should only ever return 2 candidates.
+// It explores the 4 cells around the starting cell and returns the connections pipes.
 func (s *Solver) FindTileCandidates(startPosition Position) (posDirections []PositionDirection, startTileType TileType) {
 	var candidates []PositionDirection
 	var connections []Direction
 
-	if startPosition.y-1 >= 0 {
-		tileType := TileType(s.puzzle[startPosition.y-1][startPosition.x])
-		tileInfo := PipeInfoMap[tileType]
-		if tileInfo.Terminal1 == DirectionSouth || tileInfo.Terminal2 == DirectionSouth {
-			outDirection := FindNextDirection(tileType, DirectionNorth)
-			candidates = append(candidates, PositionDirection{
-				Position: Position{
-					x: startPosition.x,
-					y: startPosition.y - 1,
-				},
-				Out: outDirection,
-			})
-			connections = append(connections, DirectionNorth)
-		}
+	// check cell above
+	candidate, ok := DetermineCandidate(s.puzzle, startPosition.x, startPosition.y-1, DirectionNorth)
+	if ok {
+		candidates = append(candidates, candidate)
+		connections = append(connections, DirectionNorth) // start tile must be pointing north
 	}
 
-	if startPosition.y+1 < len(s.puzzle) {
-		tileType := TileType(s.puzzle[startPosition.y+1][startPosition.x])
-		tileInfo := PipeInfoMap[tileType]
-		if tileInfo.Terminal1 == DirectionNorth || tileInfo.Terminal2 == DirectionNorth {
-			outDirection := FindNextDirection(tileType, DirectionSouth)
-			candidates = append(candidates, PositionDirection{
-				Position: Position{
-					x: startPosition.x,
-					y: startPosition.y + 1,
-				},
-				Out: outDirection,
-			})
-			connections = append(connections, DirectionSouth)
-		}
+	// check cell below
+	candidate, ok = DetermineCandidate(s.puzzle, startPosition.x, startPosition.y+1, DirectionSouth)
+	if ok {
+		candidates = append(candidates, candidate)
+		connections = append(connections, DirectionSouth) // start tile must be pointing south
 	}
 
-	if startPosition.x-1 >= 0 {
-		tileType := TileType(s.puzzle[startPosition.y][startPosition.x-1])
-		tileInfo := PipeInfoMap[tileType]
-		if tileInfo.Terminal1 == DirectionEast || tileInfo.Terminal2 == DirectionEast {
-			outDirection := FindNextDirection(tileType, DirectionWest)
-			candidates = append(candidates, PositionDirection{
-				Position: Position{
-					x: startPosition.x - 1,
-					y: startPosition.y,
-				},
-				Out: outDirection,
-			})
-			connections = append(connections, DirectionWest)
-		}
+	// check cell to the left
+	candidate, ok = DetermineCandidate(s.puzzle, startPosition.x-1, startPosition.y, DirectionWest)
+	if ok {
+		candidates = append(candidates, candidate)
+		connections = append(connections, DirectionWest) // start tile must be pointing west
 	}
 
-	if startPosition.x+1 < len(s.puzzle[startPosition.y]) {
-		tileType := TileType(s.puzzle[startPosition.y][startPosition.x+1])
-		tileInfo := PipeInfoMap[tileType]
-		if tileInfo.Terminal1 == DirectionWest || tileInfo.Terminal2 == DirectionWest {
-			outDirection := FindNextDirection(tileType, DirectionEast)
-			candidates = append(candidates, PositionDirection{
-				Position: Position{
-					x: startPosition.x + 1,
-					y: startPosition.y,
-				},
-				Out: outDirection,
-			})
-			connections = append(connections, DirectionEast)
-		}
+	// check cell to the right
+	candidate, ok = DetermineCandidate(s.puzzle, startPosition.x+1, startPosition.y, DirectionEast)
+	if ok {
+		candidates = append(candidates, candidate)
+		connections = append(connections, DirectionEast) // start tile must be pointing east
 	}
 
 	// work out start tile type
@@ -254,144 +246,3 @@ func (s *Solver) FindTileCandidates(startPosition Position) (posDirections []Pos
 
 	return candidates, startTileType
 }
-
-// PositionDirection holds a position and the out direction for the next tile.
-type PositionDirection struct {
-	Position Position
-	Out      Direction
-}
-
-type Position struct {
-	x int
-	y int
-}
-
-type TileType rune
-
-const (
-	TileTypeVertical          TileType = '|'
-	TileTypeHorizontal        TileType = '-'
-	TileTypeBottomLeftCorner  TileType = 'L'
-	TileTypeBottomRightCorner TileType = 'J'
-	TileTypeTopLeftCorner     TileType = 'F'
-	TileTypeTopRightCorner    TileType = '7'
-	TileTypeGround            TileType = '.'
-	TileTypeStart             TileType = 'S'
-)
-
-type Direction string
-
-const (
-	DirectionNorth Direction = "north"
-	DirectionSouth Direction = "south"
-	DirectionEast  Direction = "east"
-	DirectionWest  Direction = "west"
-)
-
-type Pipe struct {
-	Terminal1 Direction
-	Terminal2 Direction
-}
-
-var PipeInfoMap = map[TileType]Pipe{
-	TileTypeVertical: {
-		Terminal1: DirectionNorth,
-		Terminal2: DirectionSouth,
-	},
-	TileTypeHorizontal: {
-		Terminal2: DirectionWest,
-		Terminal1: DirectionEast,
-	},
-	TileTypeBottomLeftCorner: {
-		Terminal1: DirectionNorth,
-		Terminal2: DirectionEast,
-	},
-	TileTypeBottomRightCorner: {
-		Terminal1: DirectionNorth,
-		Terminal2: DirectionWest,
-	},
-	TileTypeTopRightCorner: {
-		Terminal1: DirectionSouth,
-		Terminal2: DirectionWest,
-	},
-	TileTypeTopLeftCorner: {
-		Terminal1: DirectionSouth,
-		Terminal2: DirectionEast,
-	},
-}
-
-func FindNextDirection(tile TileType, inputDirection Direction) (outputDirection Direction) {
-	tileInfo := PipeInfoMap[tile]
-
-	// Invert input direction
-	// If next direction is south for example, the pipe needs to have a terminal pointing north.
-	inputDirectionReversed := ReverseDirection(inputDirection)
-
-	if tileInfo.Terminal1 == inputDirectionReversed {
-		return tileInfo.Terminal2
-	} else if tileInfo.Terminal2 == inputDirectionReversed {
-		return tileInfo.Terminal1
-	}
-
-	// handle error as this should never happen
-	return
-}
-
-func ReverseDirection(inputDirection Direction) (outputDirection Direction) {
-	switch inputDirection {
-	case DirectionNorth:
-		return DirectionSouth
-	case DirectionSouth:
-		return DirectionNorth
-	case DirectionWest:
-		return DirectionEast
-	case DirectionEast:
-		return DirectionWest
-	}
-
-	// this is an error!
-	return
-}
-
-// Given current position, and a direction, return the next position
-func GetNextPosition(currentPos Position, direction Direction) Position {
-	x := currentPos.x
-	y := currentPos.y
-
-	switch direction {
-	case DirectionNorth:
-		y -= 1
-	case DirectionSouth:
-		y += 1
-	case DirectionWest:
-		x -= 1
-	case DirectionEast:
-		x += 1
-	}
-
-	return Position{
-		x: x,
-		y: y,
-	}
-}
-
-// Defines whether the tile contains a wall or a cell
-type TileContainerType string
-
-const (
-	TileContainerType_Wall TileContainerType = "wall"
-	TileContainerType_Cell TileContainerType = "cell"
-)
-
-type TileState struct {
-	TileContainerType     TileContainerType
-	WallType              TileType
-	TileContainerLocation TileContainerLocation
-}
-
-type TileContainerLocation string
-
-const (
-	TileContainerLocation_Inside  TileContainerLocation = "inside"
-	TileContainerLocation_Outside TileContainerLocation = "outside"
-)
