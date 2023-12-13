@@ -2,6 +2,7 @@ package solutions
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Solver struct {
@@ -32,11 +33,26 @@ func (s *Solver) LoadArrayOfLines(lines []string) {
 
 // LoadLine loads the input line into the internal representation of the input content.
 func (s *Solver) LoadLine(line string) {
+	line = strings.TrimSpace(line)
+	if line == "" {
+		return
+
+	}
+
 	s.inputContent = append(s.inputContent, line)
 }
 
 // ComputeResult computes the result and stores it in the result field.
 func (s *Solver) ComputeResult() {
+	if s.debug {
+		fmt.Println("%%%%%%%%%%")
+		fmt.Println("Input:")
+		for _, line := range s.inputContent {
+			fmt.Println(line)
+		}
+		fmt.Println("%%%%%%%%%%")
+	}
+
 	// create puzzle representation
 	for _, line := range s.inputContent {
 		if len(line) == 0 {
@@ -74,6 +90,7 @@ func (s *Solver) ComputeResult() {
 	s.SetTilesForWallsOnly(tileCandidates[0], startTileType)
 
 	if s.debug {
+		fmt.Println("%%%%%%%%%%")
 		fmt.Println("Walls:")
 		for _, line := range s.tiles {
 			for _, tile := range line {
@@ -85,7 +102,7 @@ func (s *Solver) ComputeResult() {
 			}
 			fmt.Println()
 		}
-		fmt.Println()
+		fmt.Println("%%%%%%%%%%")
 	}
 
 	// Mark all cells as being inside
@@ -101,6 +118,7 @@ func (s *Solver) ComputeResult() {
 	s.ExpandPuzzle()
 
 	// Run Flood fill algo and mark cells we find as being outside.
+	s.FloodFill()
 
 	// Count how many tiles are of type cell and are inside the loop
 	result := 0
@@ -112,24 +130,25 @@ func (s *Solver) ComputeResult() {
 		}
 	}
 
-	// if s.debug {
-	// 	fmt.Println("Tiles State:")
-	// 	for _, line := range s.tiles {
-	// 		for _, tile := range line {
-	// 			if tile.TileContainerType == TileContainerType_Wall {
-	// 				fmt.Printf("%s", string(tile.WallType))
-	// 			} else {
-	// 				if tile.TileContainerLocation == TileContainerLocation_Inside {
-	// 					fmt.Printf("I")
-	// 				} else if tile.TileContainerLocation == TileContainerLocation_Outside {
-	// 					fmt.Printf("O")
-	// 				}
-	// 			}
-	// 		}
-	// 		fmt.Println()
-	// 	}
-	// 	fmt.Println()
-	// }
+	if s.debug {
+		fmt.Println("%%%%%%%%%%")
+		fmt.Println("Tiles State:")
+		for _, line := range s.tiles {
+			for _, tile := range line {
+				if tile.TileContainerType == TileContainerType_Wall {
+					fmt.Printf("%s", string(tile.WallType))
+				} else {
+					if tile.TileContainerLocation == TileContainerLocation_Inside {
+						fmt.Printf("I")
+					} else if tile.TileContainerLocation == TileContainerLocation_Outside {
+						fmt.Printf("O")
+					}
+				}
+			}
+			fmt.Println()
+		}
+		fmt.Println("%%%%%%%%%%")
+	}
 
 	s.result = result
 }
@@ -159,19 +178,134 @@ func (s *Solver) FindStartingPosition() Position {
 func (s *Solver) ExpandPuzzle() {
 	var tiles [][]TileState
 
-	// TODO: remove this
-	tiles = s.tiles
+	// create first row with the right size
+	row := make([]TileState, len(s.tiles[0])*2+1)
+	for i, c := range row {
+		c.TileContainerType = TileContainerType_Cell
+		c.TileContainerLocation = TileContainerLocation_Outside
+		row[i] = c
+	}
+	tiles = append(tiles, row)
 
-	// Expand the puzzle to include one extra column per column
-	// Expand the puzzle to include one extra row per row
-	// Make sure we have a border all around so the next algo can fill around
+	for i, tilesRow := range s.tiles {
+		// put normal row -------------------------------
+		row := make([]TileState, len(s.tiles[i])*2+1)
+
+		// create first empty cell
+		row[0] = TileState{
+			TileContainerType:     TileContainerType_Cell,
+			TileContainerLocation: TileContainerLocation_Outside,
+		}
+
+		for j, tileState := range tilesRow {
+			// put normal cell
+			row[1+j*2] = tileState
+
+			// put spacing cell
+			if tileState.TileContainerType == TileContainerType_Wall && TileHasDirection(tileState.WallType, DirectionEast) {
+				row[1+j*2+1] = TileState{
+					TileContainerType: TileContainerType_Wall,
+					WallType:          TileTypeHorizontal,
+				}
+			} else {
+				row[1+j*2+1] = TileState{
+					TileContainerType:     TileContainerType_Cell,
+					TileContainerLocation: TileContainerLocation_Outside,
+				}
+			}
+		}
+
+		tiles = append(tiles, row)
+		// ----------------------------------------------
+
+		// put spacing row ------------------------------
+		spacingRow := make([]TileState, len(s.tiles[i])*2+1)
+
+		// create first empty cell
+		spacingRow[0] = TileState{
+			TileContainerType:     TileContainerType_Cell,
+			TileContainerLocation: TileContainerLocation_Outside,
+		}
+
+		// put spacing row
+		for j, tileState := range tilesRow {
+			// put vertical spacing cell
+			if tileState.TileContainerType == TileContainerType_Wall && TileHasDirection(tileState.WallType, DirectionSouth) {
+				spacingRow[1+j*2] = TileState{
+					TileContainerType: TileContainerType_Wall,
+					WallType:          TileTypeVertical,
+				}
+			} else {
+				spacingRow[1+j*2] = TileState{
+					TileContainerType:     TileContainerType_Cell,
+					TileContainerLocation: TileContainerLocation_Outside,
+				}
+			}
+
+			// put spacing cell
+			spacingRow[1+j*2+1] = TileState{
+				TileContainerType:     TileContainerType_Cell,
+				TileContainerLocation: TileContainerLocation_Outside,
+			}
+		}
+
+		tiles = append(tiles, spacingRow)
+		// ----------------------------------------------
+	}
 
 	s.tiles = tiles
 }
 
 // FloodFill flood fills the puzzle marking all cells it can find as being outside.
 func (s *Solver) FloodFill() {
+	queue := SimplePositionsQueue{}
+	visited := make(map[Position]struct{})
 
+	// start at 0,0 coordinates
+	queue.Enqueue(Position{x: 0, y: 0})
+
+	for queue.Len() > 0 {
+		pos := queue.Dequeue()
+		visited[pos] = struct{}{}
+
+		// mark cell as being outside
+		s.tiles[pos.y][pos.x] = TileState{
+			TileContainerType:     TileContainerType_Cell,
+			TileContainerLocation: TileContainerLocation_Outside,
+		}
+
+		// loop over neighbors
+		for _, pos := range s.FindValidNeighbors(pos) {
+			if _, ok := visited[pos]; !ok {
+				queue.Enqueue(pos)
+			}
+		}
+	}
+}
+
+func (s *Solver) FindValidNeighbors(tilePos Position) []Position {
+	abovePos := Position{x: tilePos.x, y: tilePos.y - 1}
+	belowPos := Position{x: tilePos.x, y: tilePos.y + 1}
+	leftPos := Position{x: tilePos.x - 1, y: tilePos.y}
+	rightPos := Position{x: tilePos.x + 1, y: tilePos.y}
+
+	positions := []Position{abovePos, belowPos, leftPos, rightPos}
+	var validNeighbors []Position
+
+	for _, pos := range positions {
+		if !IndexesAreWithinBounds(s.tiles, pos) {
+			continue
+		}
+		if s.tiles[pos.y][pos.x].TileContainerType == TileContainerType_Cell {
+			validNeighbors = append(validNeighbors, pos)
+		}
+	}
+
+	return validNeighbors
+}
+
+func IndexesAreWithinBounds(tiles [][]TileState, pos Position) bool {
+	return pos.y >= 0 && pos.y < len(tiles) && pos.x >= 0 && pos.x < len(tiles[0])
 }
 
 // setup map with the walls part of the path only (and substitute start position with correct pipe)

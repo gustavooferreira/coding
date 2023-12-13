@@ -2,7 +2,6 @@ package solutions
 
 import (
 	"fmt"
-	"strings"
 )
 
 type Solver struct {
@@ -28,11 +27,6 @@ func (s *Solver) LoadArrayOfLines(lines []string) {
 
 // LoadLine loads the input line into the internal representation of the input content.
 func (s *Solver) LoadLine(line string) {
-	line = strings.TrimSpace(line)
-	if line == "" {
-		return
-	}
-
 	s.inputContent = append(s.inputContent, line)
 }
 
